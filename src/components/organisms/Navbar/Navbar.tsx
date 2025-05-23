@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
-import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { useAuthStore } from '../../../stores/authStore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Moon, Sun, LogOut } from 'lucide-react-native';
-import { useTheme } from '../../../context/ThemeContext/ThemeContext';
+import { useThemeStore } from '../../../stores/themeStore';
 import { styles } from './styles';
 
 type RootStackParamList = {
@@ -17,9 +17,9 @@ type RootStackParamList = {
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const Navbar: React.FC = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout } = useAuthStore();
   const navigation = useNavigation<NavigationProp>();
-  const { theme, toggleTheme } = useTheme(); 
+const { theme, toggleTheme } = useThemeStore();
   const isDarkMode = theme === 'dark';
 
   const handleLogout = () => {

@@ -1,15 +1,11 @@
+// src/organisms/ProductDetail/styles.ts
 import { StyleSheet, Dimensions, PixelRatio } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = SCREEN_WIDTH / 375;
 
-const scaleSize = (size: number) => {
-  return Math.round(PixelRatio.roundToNearestPixel(size * scale));
-};
-
-const scaleFont = (size: number) => {
-  return Math.round(PixelRatio.roundToNearestPixel(size * scale));
-};
+const scaleSize = (size: number) => Math.round(PixelRatio.roundToNearestPixel(size * scale));
+const scaleFont = (size: number) => Math.round(PixelRatio.roundToNearestPixel(size * scale));
 
 const IMAGE_HEIGHT = SCREEN_WIDTH * 0.75;
 
@@ -20,13 +16,42 @@ export const getStyles = (theme: 'light' | 'dark') =>
       backgroundColor: theme === 'dark' ? '#1A1C1E' : '#f5f5f5',
       alignItems: 'center',
     },
-    image: {
+    swiperContainer: {
       width: '100%',
-      height: IMAGE_HEIGHT,
-      resizeMode: 'contain',
-      backgroundColor: theme === 'dark' ? '#2A2C2F' : '#fff', 
-      borderRadius: scaleSize(12),
+      height: IMAGE_HEIGHT + scaleSize(32),
       marginBottom: scaleSize(16),
+    },
+    swiperBorder: {
+      height: scaleSize(4),
+      width: '100%',
+      backgroundColor: theme === 'dark' ? '#4DA6FF' : '#007bff',
+      alignSelf: 'center',
+      borderRadius: scaleSize(2),
+      marginTop: scaleSize(8),
+    },
+    imageWrapper: {
+  width: '100%',
+  height: IMAGE_HEIGHT,
+  borderRadius: scaleSize(12),
+  overflow: 'hidden',  // clips image to border radius
+  borderWidth: 3,
+  borderColor: theme === 'dark' ? '#444' : '#ccc',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  elevation: 4,
+},
+image: {
+  width: '100%',
+  height: IMAGE_HEIGHT,
+  resizeMode: 'contain',  // keeps whole image visible, may add blank spaces
+},
+
+    noImageContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: 300,
     },
     content: {
       width: '100%',
@@ -51,9 +76,24 @@ export const getStyles = (theme: 'light' | 'dark') =>
       textAlign: 'center',
       fontFamily: 'Poppins-Regular',
     },
+    map: {
+      width: '100%',
+      height: scaleSize(200),
+      borderRadius: scaleSize(12),
+      marginBottom: scaleSize(20),
+    },
+    noLocationContainer: {
+      padding: 16,
+      alignItems: 'center',
+    },
+    ownerContainer: {
+      width: '100%',
+      marginBottom: scaleSize(20),
+      alignItems: 'center',
+      gap: scaleSize(8),
+    },
     buttonContainer: {
       width: '100%',
-      marginTop: scaleSize(10),
       flexDirection: 'column',
       rowGap: scaleSize(16),
     },

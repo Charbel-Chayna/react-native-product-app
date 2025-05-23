@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -23,40 +23,70 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import backgroundImage from '../../../../assets/images/background.png';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../../context/AuthContext/AuthContext';
+import * as Animatable from 'react-native-animatable';
+import API from '../../../services/axios';
+import { useAuthStore } from '../../../stores/authStore';
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Login: undefined;
   SignUp: { email: string };
-  Verification: undefined;
+  Verification: { email: string };
+  ProductList: undefined;
+  ProductDetail: { productId: string };
 };
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const passwordRef = React.useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+
+  const [loading, setLoading] = React.useState(false);  
 
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
-  const { login, isLoggedIn } = useAuth();
+  const { login: authLogin } = useAuthStore();
 
-  const onSubmit = (data: LoginFormData) => {
-    const { username, password } = data;
-    if (username === 'eurisko' && password === 'academy2025') {
-      login();  
-    } else {
-      Alert.alert('Login Failed', 'Invalid username or password');
-    }
-  };
+  
 
-  useEffect(() => {
-    if (isLoggedIn) {  
-      navigation.navigate('Verification');
+
+  const onSubmit = async (data: LoginFormData) => {
+  if (loading) return;
+  setLoading(true);
+
+  try {
+    console.log('[LoginScreen] Submitting login for:', data.email);
+    const result = await authLogin(data.email, data.password);
+    console.log('[LoginScreen] Login result:', result);
+
+    if (result === 'success') {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'ProductList' }],
+      });
+      return;
     }
-  }, [isLoggedIn]);  
+
+    if (result === 'unverified') {
+      console.log('[LoginScreen] Unverified, resending OTP for:', data.email);
+      await API.post('/api/auth/resend-verification-otp', { email: data.email });
+      Alert.alert('Verification Required', 'We sent you a fresh code.');
+      navigation.navigate('Verification', { email: data.email });
+      return;
+    }
+
+    Alert.alert('Login Failed', 'Invalid email or password.');
+  } catch (err: any) {
+    console.error('[LoginScreen] Unexpected error during login:', err);
+    Alert.alert('Error', 'Something went wrong. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <ImageBackground
@@ -67,7 +97,6 @@ export const LoginScreen: React.FC = () => {
     >
       <View style={styles.overlay}>
         <SafeAreaView style={styles.topSafeArea} />
-
         <KeyboardAvoidingView
           style={styles.container}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -78,55 +107,70 @@ export const LoginScreen: React.FC = () => {
                 contentContainerStyle={styles.innerContainer}
                 keyboardShouldPersistTaps="handled"
               >
-                <Text style={styles.title}>Login</Text>
+                <Animatable.View animation="fadeInDown" duration={2000} delay={100}>
+                  <Text style={styles.title}>Login</Text>
+                </Animatable.View>
 
-                <Controller
-                  control={control}
-                  name="username"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      label="Email:"
-                      placeholder="Enter your email"
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      error={errors.username?.message}
-                      returnKeyType="next"
-                      onSubmitEditing={() => passwordRef.current?.focus()}
-                    />
-                  )}
-                />
+                <Animatable.View animation="fadeInUp" duration={1000} delay={300}>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        label="Email:"
+                        placeholder="Enter your email"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        error={errors.email?.message}
+                        returnKeyType="next"
+                        onSubmitEditing={() => passwordRef.current?.focus()}
+                      />
+                    )}
+                  />
+                </Animatable.View>
 
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      ref={passwordRef}                         
-                      label="Password:"
-                      placeholder="Enter your password"
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry
-                      error={errors.password?.message}
-                      returnKeyType="done"
-                      onSubmitEditing={handleSubmit(onSubmit)} 
-                    />
-                  )}
-                />
+                <Animatable.View animation="fadeInUp" duration={1000} delay={500}>
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        ref={passwordRef}
+                        label="Password:"
+                        placeholder="Enter your password"
+                        secureTextEntry
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        error={errors.password?.message}
+                        returnKeyType="done"
+                        onSubmitEditing={handleSubmit(onSubmit)}
+                      />
+                    )}
+                  />
+                </Animatable.View>
 
-                <View style={styles.buttonContainer}>
-                  <Button variant={ButtonVariant.PRIMARY} onPress={handleSubmit(onSubmit)}>
-                    Login
-                  </Button>
+                <Animatable.View animation="fadeInUp" duration={1000} delay={700}>
+                  <View style={styles.buttonContainer}>
+                    <Button
+                      variant={ButtonVariant.PRIMARY}
+                      onPress={handleSubmit(onSubmit)}
+                      disabled={loading}
+                    >
+                      {loading ? 'Logging in...' : 'Login'}
+                    </Button>
 
-                  <TouchableOpacity onPress={() => navigation.navigate('SignUp', { email: '' })}>
-                    <Text style={[styles.linkText, { textDecorationLine: 'underline' }]}>
-                      Don't have an account? Sign Up
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUp', { email: '' })}>
+                      <Text style={[styles.linkText, { textDecorationLine: 'underline' }]}>
+                        Don’t have an account? Sign Up
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </Animatable.View>
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>

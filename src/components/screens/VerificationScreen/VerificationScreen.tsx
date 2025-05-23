@@ -11,28 +11,81 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../atoms/Button';
 import { styles } from './styles';
 import { ButtonVariant } from '../../atoms/Button/Button.type';
-import { useAuth } from '../../../context/AuthContext/AuthContext'; 
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import API from '../../../services/axios';
+import { useAuthStore } from './../../../stores/authStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+type RootStackParamList = {
+  Login: undefined;
+  SignUp: { email: string };
+  Verification: { email: string };
+  ProductList: undefined;
+  ProductDetail: { productId: string };
+};
+
+type VerificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Verification'>;
+type VerificationScreenRouteProp = RouteProp<RootStackParamList, 'Verification'>;
 
 export const VerificationScreen: React.FC = () => {
-  const { verify } = useAuth(); 
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const inputRefs = [
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-  ];
+  const { verify } = useAuthStore();
+    const { isLoggedIn, isVerified } = useAuthStore();
 
-  const handleVerify = () => {
-    const otpCode = otp.join('');
-    console.log('OTP Entered:', otpCode);
-
-    if (otpCode.length === 4) {
-      verify(); 
-    } else {
-      Alert.alert('Enter a 4-digit code');
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    } else if (isVerified) {
+      navigation.reset({ index: 0, routes: [{ name: 'ProductList' }] });
     }
-  };
+  }, [isLoggedIn, isVerified]);
+
+  const navigation = useNavigation<VerificationScreenNavigationProp>();
+  const route = useRoute<VerificationScreenRouteProp>();
+
+const email = useAuthStore(state => state.email) ?? '';
+  const [otp, setOtp] = useState(new Array(6).fill(''));
+  const inputRefs = Array(6).fill(null).map(() => useRef<TextInput>(null));
+  const [isResending, setIsResending] = useState(false);
+
+ const handleVerify = async () => {
+  const otpCode = otp.join('');
+  if (otpCode.length !== 6) {
+    Alert.alert('Enter a 6-digit code');
+    return;
+  }
+
+  try {
+    const response = await API.post('/api/auth/verify-otp', { email, otp: otpCode });
+
+    if (response.data.success) {
+      useAuthStore.setState({
+        isVerified: true,
+        isLoggedIn: false,  
+        accessToken: null, 
+      });
+
+      Alert.alert(
+        'Verified!',
+        'Your email has been verified. Please login to continue.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+            },
+          },
+        ]
+      );
+    } else {
+      Alert.alert('Verification failed', response.data.error?.message || 'Invalid code');
+    }
+  } catch (error: any) {
+    Alert.alert('Verification error', error.response?.data?.message || error.message || 'An error occurred');
+  }
+};
+
 
   useEffect(() => {
     if (otp.every((digit) => digit !== '')) {
@@ -74,12 +127,13 @@ export const VerificationScreen: React.FC = () => {
     }
   };
 
+
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={styles.container}>
         <View style={styles.inner}>
           <Text style={styles.title}>Enter Verification Code</Text>
-          <Text style={styles.subtitle}>We’ve sent a 4-digit code to your email.</Text>
+          <Text style={styles.subtitle}>We’ve sent a 6-digit code to your email: {email}</Text>
 
           <View style={styles.otpContainer}>
             {otp.map((digit, index) => (
@@ -100,6 +154,7 @@ export const VerificationScreen: React.FC = () => {
           <Button onPress={handleVerify} variant={ButtonVariant.PRIMARY}>
             Verify
           </Button>
+         
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>

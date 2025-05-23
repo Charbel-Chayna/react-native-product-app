@@ -2,6 +2,7 @@ export enum ButtonVariant {
     PRIMARY = 'primary',
     OUTLINE_PRIMARY = 'outline-primary',
     DANGER = 'danger',
+    SECONDARY = 'secondary',
   }
   
   import { GestureResponderEvent } from 'react-native';
@@ -12,5 +13,6 @@ export enum ButtonVariant {
     variant?: ButtonVariant;
     disabled?: boolean;
     style?: object;
+    
   }
   

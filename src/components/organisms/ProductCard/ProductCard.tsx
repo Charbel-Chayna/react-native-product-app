@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, Image, Text } from 'react-native';
 import { getStyles } from './styles';
-import { useTheme } from '../../../context/ThemeContext/ThemeContext';
+import { useThemeStore } from '../../../stores/themeStore';
 
 type Props = {
   title: string;
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const ProductCard: React.FC<Props> = ({ title, price, imageUrl, onPress }) => {
-  const { theme } = useTheme();
+const { theme, toggleTheme } = useThemeStore();
   const styles = getStyles(theme); 
 
   return (

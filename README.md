@@ -1,58 +1,27 @@
-# 🛒 React Native Product Listing App
+# React Native Product Listing App
 
-This is **Assignment 1** for the React Native course. It includes basic authentication screens, navigation, product listing with `FlatList`, and a product detail page. The login state and dark mode are managed using **Context API**.
+A React Native app that allows users to authenticate and manage product listings. Includes features like login, signup, verification, product CRUD, image uploads, location selection, and more.
 
----
+##  Features
 
-## 🔐 Login Credentials
+*  **User Authentication**: Login, Signup, Email Verification
+*  **Product Listing**: Pagination, Search, and Price Sorting
+*  **Image Picker**: Choose images from camera or gallery
+*  **MapView**: Tap-to-select and address-based location search
+*  **State Management**: Zustand-based authentication and theme stores
+*  **Architecture**: Atomic design component structure
+*  **Image Swiper**: Swipe through images with long-press to save
+*  **Product Detail Screen**: Displays location on map and contact info
 
-Use these credentials to log in:
+## ⚠️ Known Issues
 
-- **Username**: `eurisko`  
-- **Password**: `academy2025`
+Sometimes when submitting a form (e.g., login, signup, add product), it may not respond immediately or fail with a backend error like HTTP 521.
 
-> The signup screen is designed but **not functional yet** — they will be activated in a future assignment after backend/database integration.
+**Possible Causes**:
 
----
+* Network instability
+* Temporary backend downtime
 
-## 📱 Features
+**Solution**:
 
-- React Native CLI project structure
-- **Login**, **Signup**, and **OTP Verification** screens
-- Form validation with `react-hook-form` + `zod`
-- **Context API** for login and theme state
-- Product listing using **FlatList**
-- Product detail screen with:
-  - Image
-  - Title
-  - Description
-  - Price
-  - Share button
-  - Add to Cart button (not functional yet)
-- Basic **dark mode toggle**
-- Responsive styles using `Dimensions` + `PixelRatio`
-- Custom fonts applied to all text
-
----
-
-## 🧭 Navigation
-
-- Implemented using `@react-navigation/native`
-- Stack navigation between:
-  - Authentication screens
-  - Product listing
-  - Product detail
-- Parameters passed between screens
-
----
-
-## 🚀 Tech Stack
-
-- React Native CLI
-- React Hook Form
-- Zod
-- Context API
-- React Navigation
-- TypeScript
-- Custom Fonts
-- StyleSheet API
+> If you face this issue, simply try pressing the Submit button again after a moment. This is not a bug in the app — retrying generally resolves the issue.

@@ -1,21 +1,49 @@
 import { StyleSheet } from 'react-native';
 
-const LIST_PADDING = 16;
-const SPACE_BETWEEN = 12;
-
 export const getStyles = (isDarkMode: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDarkMode ? '#6F7F7F' : '#f5f5f5',
-    },
-    listContent: {
-      paddingHorizontal: LIST_PADDING,
-      paddingTop: SPACE_BETWEEN,
-      paddingBottom: SPACE_BETWEEN,
+      backgroundColor: isDarkMode ? '#121212' : '#fff',
     },
     columnWrapper: {
       justifyContent: 'space-between',
-      marginBottom: SPACE_BETWEEN,
+      paddingHorizontal: 10,
+    },
+    listContent: {
+      paddingBottom: 20,
+      paddingHorizontal: 5,
+    },
+    paginationContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderTopWidth: 1,
+      borderTopColor: isDarkMode ? '#444' : '#ddd',
+      marginHorizontal: 10,
+      borderRadius: 8,
+      marginBottom: 10, 
+    },
+    paginationButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+      borderRadius: 6,
+      backgroundColor: isDarkMode ? '#444' : '#ccc',
+      marginHorizontal: 4,
+    },
+    paginationText: {
+      fontSize: 14,
+      color: isDarkMode ? '#eee' : '#000',
+    },
+    disabledButton: {
+      backgroundColor: isDarkMode ? '#222' : '#eee',
+    },
+    activePage: {
+      backgroundColor: '#007bff',
+    },
+    activePageText: {
+      color: '#fff',
+      fontWeight: 'bold',
     },
   });

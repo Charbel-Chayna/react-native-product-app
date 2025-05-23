@@ -17,6 +17,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   innerContainer: {
+    flexGrow: 1, // 👈 Add this
     padding: scaleSize(20),
     justifyContent: 'center',
   },
